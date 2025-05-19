@@ -1,10 +1,26 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { useEffect } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { useGetYogaQuery } from '../../store/api/yogaApi'
+
+  
 
 const YogaTypes = () => {
+  const { data, error, isLoading,isSuccess } = useGetYogaQuery()
+
+ 
+  if (isLoading) return <ActivityIndicator size="large" color="#0000ff" />
+ 
+  if (error) {
+      console.log("Error object: ", JSON.stringify(error, null, 2));
+    return <Text>Error fetching yoga data</Text>}
+  
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Yoga Types</Text>
+            {data?.map((yoga, index) => (
+        <Text key={index}>{JSON.stringify(yoga)}</Text>
+      ))}
     </View>
   );
 };
