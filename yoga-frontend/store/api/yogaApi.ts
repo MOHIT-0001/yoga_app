@@ -1,10 +1,11 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
+
 export const yogaApi = createApi({
   reducerPath: 'yogaApi',
   baseQuery: fetchBaseQuery({ baseUrl: 'http://10.0.2.2:5000/api/' }),
   endpoints: (builder) => ({
-    getYoga: builder.query<any[], void>({
+    getYoga: builder.query<any, void>({
       query: () => 'yoga',
     }),
   }),

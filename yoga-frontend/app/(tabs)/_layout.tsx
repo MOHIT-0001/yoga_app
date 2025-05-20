@@ -12,10 +12,10 @@ export default function TabLayout() {
         tabBarIcon: ({ color, size }) => {
           let iconName: keyof typeof Ionicons.glyphMap;
 
-          if (route.name === 'YogaTypes') {
+          if (route.name === 'Home') {
             iconName = 'body-outline';
-          } else if (route.name === 'Videos') {
-            iconName = 'videocam-outline';
+          } else if (route.name === 'Listen') {
+            iconName = 'musical-notes-outline';
           } else if (route.name === 'Favorites') {
             iconName = 'heart-outline';
           } else if (route.name === 'Progress') {
@@ -28,8 +28,8 @@ export default function TabLayout() {
         },
       })}
     >
-      <Tabs.Screen name="YogaTypes" />
-      <Tabs.Screen name="Videos" />
+      <Tabs.Screen name="Home" />
+      <Tabs.Screen name="Listen" />
       <Tabs.Screen name="Favorites" />
       <Tabs.Screen name="Progress" />
     </Tabs>

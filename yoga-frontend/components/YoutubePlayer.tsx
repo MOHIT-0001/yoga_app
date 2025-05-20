@@ -1,10 +1,14 @@
 import React from 'react';
 import { WebView } from 'react-native-webview';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, Dimensions } from 'react-native';
+
 
 interface YoutubePlayerProps {
   youtubeUrl: string;
 }
+
+const screenWidth = Dimensions.get("window").width;
+const contentWidth = screenWidth * 0.9;
 
 const YoutubePlayer: React.FC<YoutubePlayerProps> = ({ youtubeUrl }) => {
   const getYouTubeId = (url: string): string | null => {
@@ -40,9 +44,8 @@ const YoutubePlayer: React.FC<YoutubePlayerProps> = ({ youtubeUrl }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    width: '100%',
-    height: 300, // Adjust as needed
+    
+     width: contentWidth, height: 200, marginBottom: 15
   },
   webView: {
     flex: 1,
