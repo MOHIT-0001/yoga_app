@@ -1,14 +1,14 @@
 import { useLocalSearchParams } from 'expo-router';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { Card } from 'react-native-paper';
-import { useGetYogaQuery } from '../../store/api/yogaApi';
+import { useGetYogaTypesQuery } from '../../store/api/yogaApi';
 import {  useRouter } from 'expo-router';
 import { TouchableOpacity } from 'react-native';
 
 
 const YogaTypes = () => {
   const { yogaTypes } = useLocalSearchParams(); 
-  const { data, error, isLoading } = useGetYogaQuery();
+  const { data, error, isLoading } = useGetYogaTypesQuery();
   const router = useRouter();
   
 const params = useLocalSearchParams();
@@ -41,7 +41,7 @@ const decodedCategory = decodeURIComponent(
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>You selected: {decodedCategory}</Text>
+      <Text style={styles.text}>{decodedCategory}</Text>
       <View style={styles.cardsContainer}>
        {selectedYoga.poses.map((pose: any, index: number) => (
   <TouchableOpacity
@@ -73,6 +73,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 10,
+    color:'green'
   },
   cardsContainer: {
     flexDirection: 'row',

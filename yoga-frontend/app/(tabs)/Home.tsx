@@ -2,14 +2,14 @@ import React from 'react';
 import { useEffect } from 'react';
 import { Card } from 'react-native-paper';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { useGetYogaQuery } from '../../store/api/yogaApi'
+import { useGetYogaTypesQuery } from '../../store/api/yogaApi'
 import { Dimensions } from 'react-native';
 import { TouchableOpacity } from 'react-native';
 import {  useRouter } from 'expo-router';
 
 
 const Home = () => {
-  const { data, error, isLoading } = useGetYogaQuery()
+  const { data, error, isLoading } = useGetYogaTypesQuery()
 
   const screenWidth = Dimensions.get('window').width;
 const router = useRouter();
@@ -47,7 +47,8 @@ export default Home;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    // justifyContent: 'center',
+    marginTop:50,
     alignItems: 'center',
     backgroundColor: '#fff',
   },

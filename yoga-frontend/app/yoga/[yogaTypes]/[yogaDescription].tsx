@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useLocalSearchParams } from "expo-router";
-import { useGetYogaQuery } from "@/store/api/yogaApi";
+import { useGetYogaTypesQuery } from "@/store/api/yogaApi";
 import YoutubePlayer from "@/components/YoutubePlayer";
 
 const screenWidth = Dimensions.get("window").width;
@@ -16,7 +16,7 @@ const contentWidth = screenWidth * 0.9;
 
 const YogaDescription = () => {
   const { yogaDescription } = useLocalSearchParams();
-  const { data, error, isLoading } = useGetYogaQuery();
+  const { data, error, isLoading } = useGetYogaTypesQuery();
 
   if (isLoading) return <ActivityIndicator size="large" color="#0000ff" />;
   if (error) return <Text>Error loading yoga data.</Text>;
@@ -45,13 +45,9 @@ const YogaDescription = () => {
   }
 
   return (
-    <ScrollView contentContainerStyle={{ alignItems: "center", padding: 20 }}>
-      <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 20 }}>
+    <ScrollView contentContainerStyle={{ padding: 20 }}>
+      <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 20, textAlign:'center', color:'green' }}>
         {yogaDescriptionData.title}
-      </Text>
-
-      <Text style={{ fontSize: 18, fontStyle: "italic", marginBottom: 10 }}>
-        Category: {foundCategoryName}
       </Text>
 
       {/* <Image
@@ -67,18 +63,18 @@ const YogaDescription = () => {
 
       <YoutubePlayer youtubeUrl={yogaDescriptionData.videoUrl} />
 
-      <Text style={{ fontSize: 16, fontWeight: "500", marginBottom: 5 }}>
+      <Text style={{ fontSize: 24, fontWeight: "500", marginBottom: 5 }}>
         Benefits:
       </Text>
       {yogaDescriptionData.benefits.map((benefit, bIndex) => (
-        <Text key={bIndex} style={{ fontSize: 14, marginBottom: 2 }}>
+        <Text key={bIndex} style={{ fontSize: 20, marginBottom: 2 }}>
           • {benefit}
         </Text>
       ))}
 
       <Text
         style={{
-          fontSize: 16,
+          fontSize: 24,
           fontWeight: "500",
           marginTop: 10,
           marginBottom: 5,
@@ -87,7 +83,7 @@ const YogaDescription = () => {
         Steps:
       </Text>
       {yogaDescriptionData.steps.map((step, sIndex) => (
-        <Text key={sIndex} style={{ fontSize: 14, marginBottom: 2 }}>
+        <Text key={sIndex} style={{ fontSize: 20, marginBottom: 2 }}>
           {sIndex + 1}. {step}
         </Text>
       ))}
