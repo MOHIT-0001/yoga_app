@@ -1,31 +1,41 @@
 import React from 'react';
-import { useEffect } from 'react';
 import { Card } from 'react-native-paper';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { useGetYogaTypesQuery } from '../../store/api/yogaApi'
-import { Dimensions } from 'react-native';
-import { TouchableOpacity } from 'react-native';
-import {  useRouter } from 'expo-router';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  Dimensions,
+  TouchableOpacity,
+} from 'react-native';
+import { useGetYogaTypesQuery } from '../../store/api/yogaApi';
+import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '@react-navigation/native';
 
 
 const Home = () => {
-  const { data, error, isLoading } = useGetYogaTypesQuery()
-
+  const { data, error, isLoading } = useGetYogaTypesQuery();
   const screenWidth = Dimensions.get('window').width;
-const router = useRouter();
+  const router = useRouter();
+      const { colors } = useTheme();
+
+  const styles = React.useMemo(() => getStyles(colors), [colors]);
 
 
-  if (isLoading) return <ActivityIndicator size="large" color="#0000ff" />
-
-  if (error) {
-    console.log("Error object: ", JSON.stringify(error, null, 2));
-    return <Text>Error fetching yoga data</Text>
-  }
+  if (isLoading) return <ActivityIndicator size="large" color="#0000ff" />;
+  if (error) return <Text>Error fetching yoga data</Text>;
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Yoga Types</Text>
-      {data?.map((yoga: { imageUrl: string; category: string }, index: number) => (
+      <View style={styles.header}>
+        <Text style={styles.text}>Yoga Types</Text>
+        <TouchableOpacity onPress={() => router.push('/settings')}>
+          <Ionicons name="settings-outline" size={24} color="black" />
+        </TouchableOpacity>
+      </View>
+
+      {data?.map((yoga, index) => (
         <TouchableOpacity
           key={index}
           onPress={() => router.push(`/yoga/${encodeURIComponent(yoga.category)}`)}
@@ -36,25 +46,30 @@ const router = useRouter();
           </Card>
         </TouchableOpacity>
       ))}
-
-
     </View>
   );
 };
 
 export default Home;
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    // justifyContent: 'center',
-    marginTop:50,
-    alignItems: 'center',
-    backgroundColor: '#fff',
-  },
-  text: {
-    fontSize: 24,
-    color: '#83f53d',
-    fontWeight: 'bold',
-  },
-});
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      marginTop: 50,
+      alignItems: 'center',
+      backgroundColor: colors.background,  // only this changed from static to dynamic
+    },
+    header: {
+      width: '90%',
+      flexDirection: 'row',
+      justifyContent: 'space-between', // keeps icon right side
+      alignItems: 'center',
+      marginBottom: 10,
+    },
+    text: {
+      fontSize: 24,
+      color: colors.text,  // text color dynamic
+      fontWeight: 'bold',
+    },
+  });
