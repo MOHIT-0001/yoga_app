@@ -4,6 +4,8 @@ const router = express.Router();
 const YogaType = require('../models/YogaType');
 const Music = require('../models/Music'); // Import the Music model
 
+
+
 // GET /api/yoga/yogatypes
 router.get('/yogatypes', async (req, res) => {
   try {

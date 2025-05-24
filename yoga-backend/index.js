@@ -4,10 +4,10 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 
-
-
 const connectDB = require('./config/db');
-const yogaRoutes = require('./routes/routes');
+const yogaFilesRoute = require('./routes/yoga_files');
+const yogaAuthRoute = require('./routes/auth');
+
 
 connectDB();
 
@@ -15,7 +15,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use('/api/yoga', yogaRoutes);
+app.use('/api/yoga', yogaFilesRoute);
+app.use('/api/yoga', yogaAuthRoute);
+
 
 const PORT = process.env.PORT || 5000;
 

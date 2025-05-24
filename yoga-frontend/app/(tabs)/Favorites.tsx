@@ -1,10 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Button } from 'react-native';
+import { useRouter } from 'expo-router';
 
 const Favorites = () => {
+    const router = useRouter();
+  
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Favorites</Text>
+            <Button title="Go to Login" onPress={() => router.push('/login')} />
     </View>
   );
 };

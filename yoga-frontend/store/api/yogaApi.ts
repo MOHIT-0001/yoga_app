@@ -11,8 +11,29 @@ export const yogaApi = createApi({
     getMusic: builder.query<any, void>({
       query: () => '/music', // Append the specific endpoint for music
     }),
+    signup: builder.mutation({
+      query: (data) => ({
+        url: '/signup',
+        method: 'POST',
+        body: data,
+      }),
+    }),
+    login: builder.mutation({
+      query: (data) => ({
+        url: '/login',
+        method: 'POST',
+        body: data,
+      }),
+    }),
+    refresh: builder.mutation({
+      query: (token) => ({
+        url: '/refresh',
+        method: 'POST',
+        body: { token },
+      }),
+    }),
   }),
 });
 
 // Export hooks for usage in functional components
-export const { useGetYogaTypesQuery, useGetMusicQuery } = yogaApi;
+export const { useGetYogaTypesQuery, useGetMusicQuery, useSignupMutation, useLoginMutation, useRefreshMutation } = yogaApi;
