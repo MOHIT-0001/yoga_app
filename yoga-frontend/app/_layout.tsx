@@ -1,29 +1,32 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
+// app/_layout.tsx
+import { ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import { DarkTheme, DefaultTheme } from '@react-navigation/native';
+import { Provider } from 'react-redux';
+import { store } from '../store';
+import { useThemeContext, ThemeProviderCustom } from './contexts/ThemeContext';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
-
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null;
-  }
-
+const InnerLayout = () => {
+  const { theme } = useThemeContext();
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={theme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
+        <Stack.Screen name="settings" />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
+  );
+};
+
+export default function RootLayout() {
+  return (
+    <Provider store={store}>
+      <ThemeProviderCustom>
+        <InnerLayout />
+      </ThemeProviderCustom>
+    </Provider>
   );
 }
