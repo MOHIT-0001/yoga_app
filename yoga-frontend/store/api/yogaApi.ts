@@ -6,10 +6,10 @@ export const yogaApi = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: 'http://10.0.2.2:5000/api/yoga' }), // Base URL now points to /api/yoga
   endpoints: (builder) => ({
     getYogaTypes: builder.query<any, void>({
-      query: () => '/yogatypes', // Append the specific endpoint
+      query: () => '/yogatypes', 
     }),
     getMusic: builder.query<any, void>({
-      query: () => '/music', // Append the specific endpoint for music
+      query: () => '/music', 
     }),
     signup: builder.mutation({
       query: (data) => ({
@@ -26,10 +26,10 @@ export const yogaApi = createApi({
       }),
     }),
     refresh: builder.mutation({
-      query: (token) => ({
+      query: (data) => ({
         url: '/refresh',
         method: 'POST',
-        body: { token },
+        body: data,
       }),
     }),
   }),
