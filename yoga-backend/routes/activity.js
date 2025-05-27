@@ -5,6 +5,35 @@ const router = express.Router();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_secret';
 
+
+router.get('/activity', async (req, res) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const user = await User.findById(decoded.id).select('favouriteYoga favouriteMusic previousYogaSessions');
+
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    res.json({
+      favouriteYoga: user.favouriteYoga,
+      favouriteMusic: user.favouriteMusic,
+      previousYogaSessions: user.previousYogaSessions,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(403).json({ error: 'Invalid or expired token' });
+  }
+});
+
+
+
 router.post('/activity', async (req, res) => {
   const authHeader = req.headers.authorization;
 
