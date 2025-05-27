@@ -6,9 +6,16 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { useThemeContext } from './contexts/ThemeContext';
+import { useRouter } from 'expo-router';
+
 
 export default function SettingsScreen() {
   const { theme, setTheme } = useThemeContext();
+    const router = useRouter();
+
+    const handleSignout = () => {
+    router.replace('/login'); 
+  };
 
   return (
     <View style={styles.container}>
@@ -31,6 +38,10 @@ export default function SettingsScreen() {
           ◉ Dark
         </Text>
       </TouchableOpacity>
+           <TouchableOpacity onPress={handleSignout}>
+      <Text style={styles.title}>Signout</Text>
+    </TouchableOpacity>
+
     </View>
   );
 }

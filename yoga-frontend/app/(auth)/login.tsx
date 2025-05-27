@@ -45,6 +45,7 @@ export default function Login() {
   };
 
   const handleLogin = async () => {
+    console.log('Login button pressed');
     try {
       const res = await login({ email, password }).unwrap();
       console.log('Login response:', res);

@@ -4,6 +4,8 @@ import { Card } from 'react-native-paper';
 import { useGetYogaTypesQuery } from '../../store/api/yogaApi';
 import {  useRouter } from 'expo-router';
 import { TouchableOpacity } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
+
 
 
 const YogaTypes = () => {
@@ -52,8 +54,24 @@ const decodedCategory = decodeURIComponent(
       )
     }
   >
-    <Card style={[styles.card, { width: screenWidth / 2 - 20 }]}>
+    <Card style={[styles.card, { width: screenWidth / 2 - 20, position: 'relative' }]}>
       <Card.Cover source={{ uri: pose.imageUrl }} />
+        <TouchableOpacity
+      style={{
+        position: 'absolute',
+        top: 10,
+        right: 10,
+        backgroundColor: 'white',
+        borderRadius: 15,
+        padding: 4,
+        zIndex: 1,
+      }}
+      onPress={() => {
+        // handle favorite logic here
+      }}
+    >
+      <MaterialIcons name="star-border" size={24} color="#f1c40f" />
+    </TouchableOpacity>
       <Card.Title title={pose.title} />
     </Card>
   </TouchableOpacity>
