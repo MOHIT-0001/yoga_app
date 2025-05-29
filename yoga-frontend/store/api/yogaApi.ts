@@ -1,15 +1,25 @@
 // Your frontend file where yogaApi is defined
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import * as SecureStore from 'expo-secure-store';
 
 export const yogaApi = createApi({
   reducerPath: 'yogaApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://10.0.2.2:5000/api/yoga' }), // Base URL now points to /api/yoga
+  baseQuery: fetchBaseQuery({
+    baseUrl: 'http://10.0.2.2:5000/api/yoga', prepareHeaders: async (headers) => {
+      const token = await SecureStore.getItemAsync('accessToken');
+      console.log('Token from SecureStore:', token); // Log the token for debugging
+      if (token) {
+        headers.set('Authorization', `Bearer ${token}`);
+      }
+      return headers;
+    }
+  }), // Base URL now points to /api/yoga
   endpoints: (builder) => ({
     getYogaTypes: builder.query<any, void>({
-      query: () => '/yogatypes', 
+      query: () => '/yogatypes',
     }),
     getMusic: builder.query<any, void>({
-      query: () => '/music', 
+      query: () => '/music',
     }),
     signup: builder.mutation({
       query: (data) => ({
@@ -32,8 +42,24 @@ export const yogaApi = createApi({
         body: data,
       }),
     }),
+    getActivity: builder.query<any, void>({
+      query: () => '/activity',
+    }),
+    addActivity: builder.mutation({
+      query: (data: { previousYogaSession: string }) => ({
+        url: '/activity',
+        method: 'POST',
+        body: data,
+      }),
+    }),
   }),
 });
 
 // Export hooks for usage in functional components
-export const { useGetYogaTypesQuery, useGetMusicQuery, useSignupMutation, useLoginMutation, useRefreshMutation } = yogaApi;
+export const { useGetYogaTypesQuery,
+  useGetMusicQuery,
+  useSignupMutation,
+  useLoginMutation,
+  useRefreshMutation,
+  useGetActivityQuery,
+  useAddActivityMutation } = yogaApi;

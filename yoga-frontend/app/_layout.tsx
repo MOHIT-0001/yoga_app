@@ -11,41 +11,70 @@ import { useEffect, useRef, useState } from 'react';
 import { useRefreshMutation } from '../store/api/yogaApi';
 import dayjs from 'dayjs';
 
-const PUBLIC_ROUTES = ['/login', '/signup', '/(auth)/login', '/(auth)/signup'];
-let refreshTimeout: number | null = null;
+// Singleton to manage token refresh globally
+const TokenRefreshManager = (() => {
+  let refreshTimeout: NodeJS.Timeout | null = null;
+  let isRefreshing = false;
 
-const scheduleTokenRefresh = async (
-  triggerRefresh: () => Promise<void>,
-  onFail: () => void
-) => {
-  const exp = await SecureStore.getItemAsync('accessTokenExp');
-  if (!exp) return;
+  const scheduleTokenRefresh = async (
+    triggerRefresh: () => Promise<void>,
+    onFail: () => void
+  ) => {
+    if (isRefreshing) return; // Prevent concurrent refreshes
+    isRefreshing = true;
 
-  const parsedExp = Number(exp);
-  const expirationTime = dayjs(parsedExp).valueOf();
-  const now = Date.now();
-  const refreshIn = expirationTime - now - 20000;
-
-  if (refreshIn <= 0) {
     try {
-      await triggerRefresh();
-    } catch {
+      const exp = await SecureStore.getItemAsync('accessTokenExp');
+      if (!exp) {
+        isRefreshing = false;
+        return;
+      }
+
+      const parsedExp = Number(exp);
+      const expirationTime = dayjs(parsedExp).valueOf();
+      const now = Date.now();
+      const refreshIn = expirationTime - now - 20000; // 20-second buffer
+
+      if (refreshTimeout) {
+        clearTimeout(refreshTimeout);
+        refreshTimeout = null;
+      }
+
+      if (refreshIn <= 0) {
+        await triggerRefresh();
+        await scheduleTokenRefresh(triggerRefresh, onFail); // Recursive call after refresh
+        isRefreshing = false;
+        return;
+      }
+
+      console.log(`Scheduling token refresh in ${refreshIn}ms`); // Debug log
+      refreshTimeout = setTimeout(async () => {
+        try {
+          await triggerRefresh();
+          await scheduleTokenRefresh(triggerRefresh, onFail); // Recursive call
+        } catch {
+          onFail();
+        } finally {
+          isRefreshing = false;
+        }
+      }, refreshIn);
+    } catch (err) {
+      console.error('Error in scheduleTokenRefresh:', err);
+      isRefreshing = false;
       onFail();
     }
-    return;
-  }
+  };
 
-  if (refreshTimeout) clearTimeout(refreshTimeout);
-
-  refreshTimeout = setTimeout(async () => {
-    try {
-      await triggerRefresh();
-      await scheduleTokenRefresh(triggerRefresh, onFail);
-    } catch {
-      onFail();
+  const stopRefresh = () => {
+    if (refreshTimeout) {
+      clearTimeout(refreshTimeout);
+      refreshTimeout = null;
     }
-  }, refreshIn);
-};
+    isRefreshing = false;
+  };
+
+  return { scheduleTokenRefresh, stopRefresh };
+})();
 
 const InnerLayout = () => {
   const { theme } = useThemeContext();
@@ -55,15 +84,15 @@ const InnerLayout = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const authChecked = useRef(false);
   const alreadyRedirected = useRef(false);
-  const refreshFailedOnce = useRef(false); // ✅ Prevent retry
 
   useEffect(() => {
     if (PUBLIC_ROUTES.includes(pathname)) {
       setIsAuthenticated(false);
+      TokenRefreshManager.stopRefresh(); // Stop refresh for public routes
       return;
     }
 
-    if (authChecked.current || refreshFailedOnce.current) return;
+    if (authChecked.current || alreadyRedirected.current) return;
     authChecked.current = true;
 
     const initAuth = async () => {
@@ -71,6 +100,7 @@ const InnerLayout = () => {
         const refreshToken = await SecureStore.getItemAsync('refreshToken');
         if (!refreshToken) throw new Error('No refresh token');
 
+        console.log('Triggering token refresh'); // Debug log
         const res = await refresh({ token: refreshToken }).unwrap();
         await SecureStore.setItemAsync('accessToken', res.accessToken);
         await SecureStore.setItemAsync('accessTokenExp', String(res.exp * 1000));
@@ -80,15 +110,15 @@ const InnerLayout = () => {
       const handleFailure = () => {
         if (!alreadyRedirected.current) {
           alreadyRedirected.current = true;
-          refreshFailedOnce.current = true;
           setIsAuthenticated(false);
           router.replace('/(auth)/login');
+          TokenRefreshManager.stopRefresh();
         }
       };
 
       try {
         await triggerRefresh();
-        await scheduleTokenRefresh(triggerRefresh, handleFailure);
+        await TokenRefreshManager.scheduleTokenRefresh(triggerRefresh, handleFailure);
       } catch (err) {
         console.error('Initial token refresh failed:', err);
         handleFailure();
@@ -96,7 +126,14 @@ const InnerLayout = () => {
     };
 
     initAuth();
-  }, [pathname]);
+
+    // Cleanup on unmount
+    return () => {
+      if (PUBLIC_ROUTES.includes(pathname)) {
+        TokenRefreshManager.stopRefresh();
+      }
+    };
+  }, [pathname, refresh]);
 
   if (isAuthenticated === null && !PUBLIC_ROUTES.includes(pathname)) {
     return null; // or a loading spinner
@@ -117,6 +154,8 @@ const InnerLayout = () => {
   );
 };
 
+const PUBLIC_ROUTES = ['/login', '/signup', '/(auth)/login', '/(auth)/signup'];
+
 export default function RootLayout() {
   return (
     <Provider store={store}>
@@ -125,4 +164,4 @@ export default function RootLayout() {
       </ThemeProviderCustom>
     </Provider>
   );
-}
+}  

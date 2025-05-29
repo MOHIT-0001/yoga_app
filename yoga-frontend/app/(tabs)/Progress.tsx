@@ -1,16 +1,30 @@
 import React from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
+import { View, Text, StyleSheet, Button, Alert } from 'react-native';
 import Stopwatch from '@/components/Stopwatch';
 import { useRouter } from 'expo-router';
+import { useAddActivityMutation } from '@/store/api/yogaApi';
 
 const Progress = () => {
   const router = useRouter();
+  const [addActivity] = useAddActivityMutation();
+
+  const handleSave = async (duration: string) => {
+     console.log(duration)
+    try {
+      const result = await addActivity({ previousYogaSession: duration }).unwrap();
+      console.log('Activity saved:', result);
+      Alert.alert('Saved!', 'Your session was recorded.');
+    } catch (error) {
+      Alert.alert('Error', 'Could not save session.');
+      console.error(error);
+    }
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Progress</Text>
 
-      <Stopwatch />
+      <Stopwatch onSave={handleSave} />
 
       <View style={styles.buttonContainer}>
         <Button

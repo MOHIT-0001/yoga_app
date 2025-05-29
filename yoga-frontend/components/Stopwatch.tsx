@@ -1,26 +1,39 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Button, StyleSheet, Text, TextStyle } from 'react-native';
+import { View, Button, StyleSheet, Text } from 'react-native';
 
-const formatTime = (ms: number): string => {
-  const minutes = Math.floor(ms / 60000);
+const formatTimeDisplay = (ms: number): string => {
+  const hours = Math.floor(ms / 3600000);
+  const minutes = Math.floor((ms % 3600000) / 60000);
   const seconds = Math.floor((ms % 60000) / 1000);
-  const tenths = Math.floor((ms % 1000) / 100);
+
   const pad = (n: number) => n.toString().padStart(2, '0');
-  return `${pad(minutes)}:${pad(seconds)}.${tenths}`;
+  return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 };
 
-const Stopwatch = () => {
+const formatReadableDuration = (ms: number): string => {
+  const hours = Math.floor(ms / 3600000);
+  const minutes = Math.floor((ms % 3600000) / 60000);
+  const seconds = Math.floor((ms % 60000) / 1000);
+
+  const parts = [];
+  if (hours > 0) parts.push(`${hours} hr`);
+  if (minutes > 0) parts.push(`${minutes} min`);
+  if (seconds > 0 || parts.length === 0) parts.push(`${seconds} sec`);
+
+  return parts.join(' ');
+};
+
+const Stopwatch = ({ onSave }: { onSave: (formattedDuration: string) => void }) => {
   const [elapsedMs, setElapsedMs] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const intervalRef = useRef<NodeJS.Timer | null>(null);
-  const [lastSavedTime, setLastSavedTime] = useState('');
 
   const start = () => {
     if (!isRunning) {
       setIsRunning(true);
       intervalRef.current = setInterval(() => {
-        setElapsedMs((prev) => prev + 100);
-      }, 100);
+        setElapsedMs((prev) => prev + 1000);
+      }, 1000);
     }
   };
 
@@ -38,22 +51,21 @@ const Stopwatch = () => {
   };
 
   const save = () => {
-    const formatted = formatTime(elapsedMs);
-    console.log('Saved Time:', formatted);
-    setLastSavedTime(formatted);
+    const humanReadable = formatReadableDuration(elapsedMs).replace(/\s/g, '');
+    console.log('Saving readable duration:', humanReadable);
+    onSave(humanReadable); // send formatted string like "1hr4min3sec" with no spaces
     reset();
   };
 
   useEffect(() => {
     return () => {
-      // Clean up on unmount
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, []);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.timerText}>{formatTime(elapsedMs)}</Text>
+      <Text style={styles.timerText}>{formatTimeDisplay(elapsedMs)}</Text>
 
       <View style={styles.buttonContainer}>
         <Button title="Start" onPress={start} />
@@ -63,9 +75,6 @@ const Stopwatch = () => {
 
       <View style={styles.saveButtonContainer}>
         <Button title="Save" color="red" onPress={save} />
-        {lastSavedTime ? (
-          <Text style={styles.savedText}>Saved Time: {lastSavedTime}</Text>
-        ) : null}
       </View>
     </View>
   );
@@ -82,7 +91,7 @@ const styles = StyleSheet.create({
     fontSize: 48,
     fontWeight: 'bold',
     color: '#333',
-  } as TextStyle,
+  },
   buttonContainer: {
     flexDirection: 'row',
     marginTop: 20,
@@ -92,10 +101,5 @@ const styles = StyleSheet.create({
   saveButtonContainer: {
     alignItems: 'center',
     marginTop: 20,
-  },
-  savedText: {
-    marginTop: 10,
-    fontSize: 18,
-    color: 'green',
   },
 });
