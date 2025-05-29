@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,15 +11,26 @@ import {
 import { Card, Title } from 'react-native-paper';
 import MusicPlayer from '@/components/MusicPlayer';
 import { useGetMusicQuery } from '@/store/api/yogaApi';
+import { useDispatch, useSelector } from 'react-redux';
+import { setMusicList } from '@/store/slices/musicSlice';
+import { RootState } from '@/store';
 
 const screenWidth = Dimensions.get('window').width;
-const cardWidth = (screenWidth * 0.9 - 10) / 2; // 90% of screen, split into 2 columns with margin
+const cardWidth = (screenWidth * 0.9 - 10) / 2;
 
 const Listen = () => {
-  const { data: musicDataFromApi, error, isLoading } = useGetMusicQuery();
-  const [showPlayer, setShowPlayer] = useState(false);
-  const [currentAudioUrl, setCurrentAudioUrl] = useState<string | null>(null);
-  const [currentTitle, setCurrentTitle] = useState<string | null>(null);
+  const dispatch = useDispatch();
+  const { data, error, isLoading } = useGetMusicQuery();
+  const musicData = useSelector((state: RootState) => state.music.musicList);
+  const [showPlayer, setShowPlayer] = React.useState(false);
+  const [currentAudioUrl, setCurrentAudioUrl] = React.useState<string | null>(null);
+  const [currentTitle, setCurrentTitle] = React.useState<string | null>(null);
+
+  useEffect(() => {
+    if (data) {
+      dispatch(setMusicList(data));
+    }
+  }, [data, dispatch]);
 
   const handleMusicPress = (audioUrl: string, title: string) => {
     setCurrentAudioUrl(audioUrl);
@@ -38,8 +49,6 @@ const Listen = () => {
   if (error) {
     return <Text style={styles.errorText}>Error fetching music data</Text>;
   }
-
-  const musicData = musicDataFromApi || [];
 
   return (
     <View style={styles.container}>

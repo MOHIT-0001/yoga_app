@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card } from 'react-native-paper';
 import {
   View,
@@ -8,23 +8,42 @@ import {
   Dimensions,
   TouchableOpacity,
 } from 'react-native';
-import { useGetYogaTypesQuery } from '../../store/api/yogaApi';
+import { useGetYogaTypesQuery, useGetActivityQuery } from '../../store/api/yogaApi';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@react-navigation/native';
-
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { setActivityData } from '../../store/slices/activitySlice';
+import { setYogaTypes } from '../../store/slices/yogaTypesSlice';
 
 const Home = () => {
-  const { data, error, isLoading } = useGetYogaTypesQuery();
+  const { data: yogaData, error, isLoading } = useGetYogaTypesQuery();
+  const {
+    data: activityData,
+    isLoading: activityLoading,
+    isError: activityError,
+  } = useGetActivityQuery();
+
+  const dispatch = useAppDispatch();
+
+  const savedYogaTypes = useAppSelector((state) => state.yogaTypes.yogaTypes);
+
   const screenWidth = Dimensions.get('window').width;
   const router = useRouter();
-      const { colors } = useTheme();
-
+  const { colors } = useTheme();
   const styles = React.useMemo(() => getStyles(colors), [colors]);
 
+  
 
-  if (isLoading) return <ActivityIndicator size="large" color="#0000ff" />;
-  if (error) return <Text>Error fetching yoga data</Text>;
+  useEffect(() => {
+    if (yogaData) {
+      dispatch(setYogaTypes(yogaData));
+    }
+  }, [yogaData, dispatch]);
+
+  if (isLoading || activityLoading)
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  if (error || activityError) return <Text>Error loading data</Text>;
 
   return (
     <View style={styles.container}>
@@ -35,7 +54,7 @@ const Home = () => {
         </TouchableOpacity>
       </View>
 
-      {data?.map((yoga, index) => (
+      {savedYogaTypes.map((yoga, index) => (
         <TouchableOpacity
           key={index}
           onPress={() => router.push(`/yoga/${encodeURIComponent(yoga.category)}`)}
@@ -58,18 +77,18 @@ const getStyles = (colors: any) =>
       flex: 1,
       marginTop: 50,
       alignItems: 'center',
-      backgroundColor: colors.background,  // only this changed from static to dynamic
+      backgroundColor: colors.background,
     },
     header: {
       width: '90%',
       flexDirection: 'row',
-      justifyContent: 'space-between', // keeps icon right side
+      justifyContent: 'space-between',
       alignItems: 'center',
       marginBottom: 10,
     },
     text: {
       fontSize: 24,
-      color: colors.text,  // text color dynamic
+      color: colors.text,
       fontWeight: 'bold',
     },
   });

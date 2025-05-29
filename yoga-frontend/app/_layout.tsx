@@ -7,6 +7,11 @@ import { store } from '../store';
 import { useThemeContext, ThemeProviderCustom } from './contexts/ThemeContext';
 import Toast from 'react-native-toast-message';
 import * as SecureStore from 'expo-secure-store';
+import { useDispatch } from 'react-redux';
+import { setMusicList } from '@/store/slices/musicSlice';
+import { useGetMusicQuery } from '@/store/api/yogaApi';
+
+
 import { useEffect, useRef, useState } from 'react';
 import { useRefreshMutation } from '../store/api/yogaApi';
 import dayjs from 'dayjs';
@@ -77,6 +82,7 @@ const TokenRefreshManager = (() => {
 })();
 
 const InnerLayout = () => {
+    const dispatch = useDispatch();
   const { theme } = useThemeContext();
   const pathname = usePathname();
   const router = useRouter();
@@ -84,6 +90,12 @@ const InnerLayout = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const authChecked = useRef(false);
   const alreadyRedirected = useRef(false);
+const { data, error, isLoading } = useGetMusicQuery();
+ useEffect(() => {
+    if (data) {
+      dispatch(setMusicList(data));
+    }
+  }, [data, dispatch]);
 
   useEffect(() => {
     if (PUBLIC_ROUTES.includes(pathname)) {

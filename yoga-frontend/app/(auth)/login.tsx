@@ -67,7 +67,7 @@ export default function Login() {
           position: 'bottom',
         });
 
-        router.replace('/(tabs)/Favorites'); // no need for setTimeout
+        router.replace('/(tabs)/Home'); // no need for setTimeout
 
       } catch (saveError) {
         console.error('Error saving tokens:', saveError);
