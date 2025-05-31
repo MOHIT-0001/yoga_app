@@ -46,9 +46,16 @@ export const yogaApi = createApi({
       query: () => '/activity',
     }),
     addActivity: builder.mutation({
-      query: (data: { previousYogaSession: string }) => ({
-        url: '/activity',
-        method: 'POST',
+      query: (data) => ({
+        url: '/update_activity',
+        method: 'PUT',
+        body: data,
+      }),
+    }),
+    deleteActivity: builder.mutation({
+      query: (data: { deleteFavouriteYoga?: string; deleteFavouriteMusic?: string }) => ({
+        url: '/activity_delete',
+        method: 'DELETE',
         body: data,
       }),
     }),
@@ -62,4 +69,5 @@ export const { useGetYogaTypesQuery,
   useLoginMutation,
   useRefreshMutation,
   useGetActivityQuery,
-  useAddActivityMutation } = yogaApi;
+  useAddActivityMutation,
+useDeleteActivityMutation } = yogaApi;

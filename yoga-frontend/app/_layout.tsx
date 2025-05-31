@@ -114,6 +114,7 @@ const { data, error, isLoading } = useGetMusicQuery();
 
         console.log('Triggering token refresh'); // Debug log
         const res = await refresh({ token: refreshToken }).unwrap();
+        console.log('Token refresh in 15min', res); // Debug log
         await SecureStore.setItemAsync('accessToken', res.accessToken);
         await SecureStore.setItemAsync('accessTokenExp', String(res.exp * 1000));
         setIsAuthenticated(true);

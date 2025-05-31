@@ -34,7 +34,7 @@ router.get('/activity', async (req, res) => {
 
 
 
-router.post('/activity', async (req, res) => {
+router.put('/update_activity', async (req, res) => {
   try {
     const authHeader = req.headers['authorization'];
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -53,13 +53,34 @@ router.post('/activity', async (req, res) => {
     } = req.body;
 
     // Update favouriteYoga
-    if (favouriteYoga !== undefined) {
-      user.favouriteYoga = favouriteYoga;
-    }
+    // if (favouriteYoga !== undefined) {
+    //   user.favouriteYoga = favouriteYoga;
+    // }
 
     // Update favouriteMusic
+    // if (favouriteMusic !== undefined) {
+    //   user.favouriteMusic = favouriteMusic;
+    // }
+
+
+        // ✅ Append to favouriteYoga array (if not already included)
+    if (favouriteYoga !== undefined) {
+      if (!Array.isArray(user.favouriteYoga)) {
+        user.favouriteYoga = []; // Initialize if undefined
+      }
+      if (!user.favouriteYoga.includes(favouriteYoga)) {
+        user.favouriteYoga.push(favouriteYoga);
+      }
+    }
+
+    // ✅ Append to favouriteMusic array (if not already included)
     if (favouriteMusic !== undefined) {
-      user.favouriteMusic = favouriteMusic;
+      if (!Array.isArray(user.favouriteMusic)) {
+        user.favouriteMusic = []; // Initialize if undefined
+      }
+      if (!user.favouriteMusic.includes(favouriteMusic)) {
+        user.favouriteMusic.push(favouriteMusic);
+      }
     }
 
     // Update or insert today's yoga session with full time addition
@@ -130,5 +151,48 @@ function formatDuration({ hr, min, sec }) {
   return parts.join(' ') || '0sec';
 }
 
+
+
+router.delete('/activity_delete', async (req, res) => {
+  try {
+    const authHeader = req.headers['authorization'];
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Authorization header missing or invalid' });
+    }
+
+    const token = authHeader.split(' ')[1];
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const user = await User.findById(decoded.id);
+
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    const { deleteFavouriteYoga, deleteFavouriteMusic } = req.body;
+
+    // Check which field to remove
+    if (deleteFavouriteYoga) {
+      user.favouriteYoga = user.favouriteYoga.filter(id => id.toString() !== deleteFavouriteYoga);
+    }
+
+    if (deleteFavouriteMusic) {
+      user.favouriteMusic = user.favouriteMusic.filter(id => id.toString() !== deleteFavouriteMusic);
+    }
+
+    if (!deleteFavouriteYoga && !deleteFavouriteMusic) {
+      return res.status(400).json({ error: 'No valid deletion field provided' });
+    }
+
+    await user.save();
+    res.json({ message: 'Favourite item deleted successfully', user });
+
+  } catch (err) {
+    console.error('Error in deleting favourite:', err);
+
+    if (err.name === 'JsonWebTokenError') {
+      return res.status(403).json({ error: 'Invalid or malformed token' });
+    }
+
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 
 module.exports = router;

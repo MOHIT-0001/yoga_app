@@ -1,10 +1,11 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { Calendar } from 'react-native-calendars';
 import { useGetActivityQuery } from '@/store/api/yogaApi';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 
 const LastYogaSessions = () => {
-  const { data, isLoading, isError } = useGetActivityQuery();
+  const { data, isLoading, isError, refetch } = useGetActivityQuery();
 
   const { markedDates, sessionList } = useMemo(() => {
     const marks: any = {};
@@ -30,6 +31,13 @@ const LastYogaSessions = () => {
 
     return { markedDates: marks, sessionList: list };
   }, [data]);
+
+    useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch])
+  );
+
 
   if (isLoading || isError) {
     return <Text style={styles.centerText}>Loading or Error...</Text>;
