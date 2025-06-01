@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {
   View,
   Text,
@@ -9,12 +9,16 @@ import {
 import { useLocalSearchParams } from "expo-router";
 import YoutubePlayer from "@/components/YoutubePlayer";
 import { useAppSelector } from "@/store/hooks";
+import { useNavigation } from '@react-navigation/native';
+import { useTheme } from '@react-navigation/native';
 
 const screenWidth = Dimensions.get("window").width;
 const contentWidth = screenWidth * 0.9;
 
 const YogaDescription = () => {
+    const { colors } = useTheme();
   const { yogaDescription } = useLocalSearchParams();
+    const navigation = useNavigation();
   const savedYogaTypes = useAppSelector((state: any) => state.yogaTypes.yogaTypes);
 
   if (!savedYogaTypes || savedYogaTypes.length === 0) {
@@ -44,6 +48,17 @@ const YogaDescription = () => {
     );
   }
 
+   useEffect(() => {
+      navigation.setOptions({
+        title: 'Practice Guide',
+         headerTitleStyle: {
+      color: colors.text, // or any color like '#ff6347'
+      fontWeight: 'bold', // optional
+    },
+      });
+    }, [navigation]);
+  
+
   return (
     <ScrollView contentContainerStyle={{ padding: 20 }}>
       <Text
@@ -52,7 +67,7 @@ const YogaDescription = () => {
           fontWeight: "bold",
           marginBottom: 20,
           textAlign: "center",
-          color: "green",
+          color: colors.text
         }}
       >
         {yogaDescriptionData.title}
@@ -60,11 +75,11 @@ const YogaDescription = () => {
 
       <YoutubePlayer youtubeUrl={yogaDescriptionData.videoUrl} />
 
-      <Text style={{ fontSize: 24, fontWeight: "500", marginBottom: 5 }}>
+      <Text style={{ fontSize: 24, fontWeight: "500", marginBottom: 5, color: colors.text }}>
         Benefits:
       </Text>
       {yogaDescriptionData.benefits.map((benefit: string, bIndex: number) => (
-        <Text key={bIndex} style={{ fontSize: 20, marginBottom: 2 }}>
+        <Text key={bIndex} style={{ fontSize: 20, marginBottom: 2, color: colors.text }}>
           • {benefit}
         </Text>
       ))}
@@ -75,12 +90,13 @@ const YogaDescription = () => {
           fontWeight: "500",
           marginTop: 10,
           marginBottom: 5,
+          color: colors.text
         }}
       >
         Steps:
       </Text>
       {yogaDescriptionData.steps.map((step: string, sIndex: number) => (
-        <Text key={sIndex} style={{ fontSize: 20, marginBottom: 2 }}>
+        <Text key={sIndex} style={{ fontSize: 20, marginBottom: 2, color: colors.text }}>
           {sIndex + 1}. {step}
         </Text>
       ))}

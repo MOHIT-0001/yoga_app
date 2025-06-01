@@ -7,12 +7,19 @@ import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { useEffect } from 'react';
 import { setActivityData } from '../../store/slices/activitySlice';
 import { useGetActivityQuery, useAddActivityMutation } from '../../store/api/yogaApi';
+import { useNavigation } from '@react-navigation/native';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
+import { useTheme } from '@react-navigation/native';
+
 
 const YogaTypes = () => {
   const { yogaTypes } = useLocalSearchParams();
+  const navigation = useNavigation();
   const router = useRouter();
   const dispatch = useAppDispatch();
   const screenWidth = Dimensions.get('window').width;
+  const { colors } = useTheme();
+  
 
   // API hooks
     const [addActivity, { isLoading: isAdding }] = useAddActivityMutation();
@@ -78,9 +85,19 @@ console.log('Adding favorite yoga with ID:', id);
     // console.log(posesToShow) 
   }  , [posesToShow]);
 
+  useEffect(() => {
+    navigation.setOptions({
+      title: yogaTypes,
+       headerTitleStyle: {
+      color: colors.text, // or any color like '#ff6347'
+      fontWeight: 'bold', // optional
+    },
+    });
+  }, [navigation]);
+
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>{decodedCategory}</Text>
+      {/* <Text style={styles.text}>{decodedCategory}</Text> */}
       <View style={styles.cardsContainer}>
         {posesToShow.length === 0 ? (
           <Text style={styles.noMoreText}>All poses are favorited!</Text>
@@ -128,7 +145,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: 'green',
+    color: Colors.primary,
     textAlign: 'center',  
   },
   cardsContainer: {
@@ -161,3 +178,4 @@ const styles = StyleSheet.create({
 });
 
 export default YogaTypes;
+

@@ -1,10 +1,12 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useEffect } from 'react';
 import { Calendar } from 'react-native-calendars';
 import { useGetActivityQuery } from '@/store/api/yogaApi';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+
 
 const LastYogaSessions = () => {
+      const navigation = useNavigation();
   const { data, isLoading, isError, refetch } = useGetActivityQuery();
 
   const { markedDates, sessionList } = useMemo(() => {
@@ -19,7 +21,7 @@ const LastYogaSessions = () => {
           marks[date] = {
             selected: true,
             marked: true,
-            selectedColor: 'blue',
+            selectedColor: 'green',
           };
 
           list.push({ date, duration });
@@ -38,6 +40,15 @@ const LastYogaSessions = () => {
     }, [refetch])
   );
 
+  useEffect(() => {
+        navigation.setOptions({
+          title: 'Previous Sessions',
+           headerTitleStyle: {
+        color: 'green', // or any color like '#ff6347'
+        fontWeight: 'bold', // optional
+      },
+        });
+      }, [navigation]);
 
   if (isLoading || isError) {
     return <Text style={styles.centerText}>Loading or Error...</Text>;

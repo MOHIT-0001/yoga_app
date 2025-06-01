@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Button, StyleSheet, Text } from 'react-native';
+import {  useTheme } from '@react-navigation/native';
+
 
 const formatTimeDisplay = (ms: number): string => {
   const hours = Math.floor(ms / 3600000);
@@ -24,6 +26,8 @@ const formatReadableDuration = (ms: number): string => {
 };
 
 const Stopwatch = ({ onSave }: { onSave: (formattedDuration: string) => void }) => {
+        const { colors } = useTheme();
+  
   const [elapsedMs, setElapsedMs] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const intervalRef = useRef<NodeJS.Timer | null>(null);
@@ -57,6 +61,9 @@ const Stopwatch = ({ onSave }: { onSave: (formattedDuration: string) => void }) 
     reset();
   };
 
+        const styles = React.useMemo(() => getStyles(colors), [colors]);
+  
+
   useEffect(() => {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
@@ -82,7 +89,7 @@ const Stopwatch = ({ onSave }: { onSave: (formattedDuration: string) => void }) 
 
 export default Stopwatch;
 
-const styles = StyleSheet.create({
+const getStyles = (colors: any) =>StyleSheet.create({
   container: {
     alignItems: 'center',
     marginTop: 50,
@@ -90,7 +97,7 @@ const styles = StyleSheet.create({
   timerText: {
     fontSize: 48,
     fontWeight: 'bold',
-    color: '#333',
+    color: colors.text,
   },
   buttonContainer: {
     flexDirection: 'row',

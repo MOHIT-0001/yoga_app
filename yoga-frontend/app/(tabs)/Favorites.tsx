@@ -23,6 +23,7 @@ import MusicPlayer from "@/components/MusicPlayer";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
+import { useTheme } from '@react-navigation/native';
 
 const screenWidth = Dimensions.get("window").width;
 const cardWidth = screenWidth / 2 - 20;
@@ -30,6 +31,7 @@ const cardWidth = screenWidth / 2 - 20;
 const Favorites = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
+    const { colors } = useTheme();
   const { data, error, isLoading, refetch } = useGetActivityQuery();
   const [deleteActivity] = useDeleteActivityMutation();
 
@@ -103,6 +105,8 @@ const Favorites = () => {
   useEffect(() => {
     // console.log(favoriteYogaItems, favoriteMusicItems, savedYogaTypes, musicData);
   }, [favoriteYogaItems, favoriteMusicItems, router, activityData]);
+
+    const styles = React.useMemo(() => getStyles(colors), [colors]);
 
   if (isLoading) {
     return (
@@ -191,23 +195,24 @@ const Favorites = () => {
 
 export default Favorites;
 
-const styles = StyleSheet.create({
+const getStyles = (colors: any) => StyleSheet.create({
   container: {
+     flex: 1,
     padding: 16,
-    backgroundColor: "#fff",
+    backgroundColor: colors.background,
   },
   header: {
     fontSize: 24,
     fontWeight: "bold",
     marginTop: 48,
-    color: "#83f53d",
+    color: colors.primary,
     marginBottom: 20, 
   },
    musicHeader: {
     fontSize: 24,
     fontWeight: "bold",
     // marginVertical:128,
-    color: "#83f53d",
+    color: colors.primary,
     marginBottom: 20,
 
   },

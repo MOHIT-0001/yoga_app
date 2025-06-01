@@ -5,6 +5,7 @@ import { DarkTheme, DefaultTheme } from '@react-navigation/native';
 import { Provider } from 'react-redux';
 import { store } from '../store';
 import { useThemeContext, ThemeProviderCustom } from './contexts/ThemeContext';
+import { CustomDarkTheme, CustomLightTheme } from './contexts/theme';
 import Toast from 'react-native-toast-message';
 import * as SecureStore from 'expo-secure-store';
 import { useDispatch } from 'react-redux';
@@ -81,8 +82,10 @@ const TokenRefreshManager = (() => {
   return { scheduleTokenRefresh, stopRefresh };
 })();
 
+
+
 const InnerLayout = () => {
-    const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const { theme } = useThemeContext();
   const pathname = usePathname();
   const router = useRouter();
@@ -90,8 +93,8 @@ const InnerLayout = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const authChecked = useRef(false);
   const alreadyRedirected = useRef(false);
-const { data, error, isLoading } = useGetMusicQuery();
- useEffect(() => {
+  const { data, error, isLoading } = useGetMusicQuery();
+  useEffect(() => {
     if (data) {
       dispatch(setMusicList(data));
     }
@@ -153,7 +156,7 @@ const { data, error, isLoading } = useGetMusicQuery();
   }
 
   return (
-    <ThemeProvider value={theme === 'dark' ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={theme === 'dark' ? CustomDarkTheme  : CustomLightTheme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)/login" options={{ headerShown: false }} />

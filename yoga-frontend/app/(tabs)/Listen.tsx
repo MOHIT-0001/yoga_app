@@ -16,12 +16,15 @@ import { setMusicList } from '@/store/slices/musicSlice';
 import { RootState } from '@/store';
 import { useGetMusicQuery, useAddActivityMutation, useGetActivityQuery } from '@/store/api/yogaApi';
 import { setActivityData } from '@/store/slices/activitySlice';
+import { useTheme } from '@react-navigation/native';
+
 
 const screenWidth = Dimensions.get('window').width;
 const cardWidth = (screenWidth * 0.9 - 10) / 2;
 
 const Listen = () => {
   const dispatch = useDispatch();
+  const { colors } = useTheme();
   const { data: musicApiData, error, isLoading: musicLoading } = useGetMusicQuery();
   const musicData = useSelector((state: RootState) => state.music.musicList);
 
@@ -59,6 +62,8 @@ const Listen = () => {
       console.error('Error adding favorite music:', error);
     }
   };
+    const styles = React.useMemo(() => getStyles(colors), [colors]);
+  
 
   if (musicLoading || activityLoading) {
     return (
@@ -129,19 +134,19 @@ const Listen = () => {
 
 export default Listen;
 
-const styles = StyleSheet.create({
+const getStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 50,
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: colors.background,
   },
   text: {
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 10,
     textAlign: 'center',
-    color: 'green',
+    color: colors.primary,
   },
   cardsContainer: {
     flexDirection: 'row',
@@ -160,9 +165,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 10,
     right: 10,
-    // backgroundColor: 'white',
-    // borderRadius: 15,
-    // padding: 4,
     zIndex: 1,
   },
   loadingContainer: {

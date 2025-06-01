@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { useGetYogaTypesQuery, useGetActivityQuery } from '../../store/api/yogaApi';
+import { CustomDarkTheme } from '../contexts/theme';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@react-navigation/native';
@@ -33,7 +34,6 @@ const Home = () => {
   const { colors } = useTheme();
   const styles = React.useMemo(() => getStyles(colors), [colors]);
 
-  
 
   useEffect(() => {
     if (yogaData) {
@@ -48,9 +48,13 @@ const Home = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.text}>Yoga Types</Text>
+        <View style={styles.headerContent}>
+
+          <Text style={styles.text}>Yoga Styles</Text>
+        </View>
+
         <TouchableOpacity onPress={() => router.push('/settings')}>
-          <Ionicons name="settings-outline" size={24} color="black" />
+          <Ionicons name="settings" size={24} color={colors.primary} />
         </TouchableOpacity>
       </View>
 
@@ -80,15 +84,22 @@ const getStyles = (colors: any) =>
       backgroundColor: colors.background,
     },
     header: {
-      width: '90%',
+      // width: '90%',
       flexDirection: 'row',
-      justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: 10,
+      justifyContent: 'space-between',
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+    },
+    headerContent: {
+      flex: 1,
+      alignItems: 'center',
     },
     text: {
       fontSize: 24,
-      color: colors.text,
+      color: colors.primary,
       fontWeight: 'bold',
+      textAlign: 'center',
+      // color: 'green',
     },
   });

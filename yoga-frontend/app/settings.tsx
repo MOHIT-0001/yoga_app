@@ -1,64 +1,117 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
+  Pressable
 } from 'react-native';
 import { useThemeContext } from './contexts/ThemeContext';
 import { useRouter } from 'expo-router';
+import { useNavigation, useTheme } from '@react-navigation/native';
+import * as SecureStore from 'expo-secure-store';
+import { RadioButton } from 'react-native-paper';
+
 
 
 export default function SettingsScreen() {
+  const [isClicked, setIsClicked] = React.useState(false);
+      const { colors } = useTheme();
+  const navigation = useNavigation();
   const { theme, setTheme } = useThemeContext();
-    const router = useRouter();
+  const router = useRouter();
 
-    const handleSignout = () => {
-    router.replace('/login'); 
+  const handleSignout = async () => {
+    setIsClicked(true);
+    try {
+      await SecureStore.deleteItemAsync('accessToken');      
+      await SecureStore.deleteItemAsync('userefreshTokenr');
+      await SecureStore.deleteItemAsync('accessTokenExp');      
+    } catch (err) {
+      console.error('Error clearing SecureStore:', err);
+    }
+    setTimeout(() => {
+      router.replace('/login');
+    }, 100); // slight delay to show the style change
   };
 
+      const styles = React.useMemo(() => getStyles(colors), [colors]);
+  
+
+  useEffect(() => {
+    navigation.setOptions({
+      title: 'Settings',
+      headerTitleStyle: {
+        color: 'green', // or any color like '#ff6347'
+        fontWeight: 'bold', // optional
+      },
+    });
+  }, [navigation]);
+
   return (
-    <View style={styles.container}>
+   <View style={styles.container}>
       <Text style={styles.title}>Choose Theme</Text>
 
-      <TouchableOpacity
-        style={styles.radio}
-        onPress={() => setTheme('light')}
-      >
-        <Text style={{ fontWeight: theme === 'light' ? 'bold' : 'normal' }}>
-          ◉ Light
-        </Text>
-      </TouchableOpacity>
+      <View style={styles.radioRow}>
+        <Text style={styles.label}>Light</Text>
+        <RadioButton
+          value="light"
+          status={theme === 'light' ? 'checked' : 'unchecked'}
+          onPress={() => setTheme('light')}
+          color={colors.primary}
+        />
+      </View>
 
-      <TouchableOpacity
-        style={styles.radio}
-        onPress={() => setTheme('dark')}
-      >
-        <Text style={{ fontWeight: theme === 'dark' ? 'bold' : 'normal' }}>
-          ◉ Dark
-        </Text>
-      </TouchableOpacity>
-           <TouchableOpacity onPress={handleSignout}>
-      <Text style={styles.title}>Signout</Text>
-    </TouchableOpacity>
+      <View style={styles.radioRow}>
+        <Text style={styles.label}>Dark</Text>
+        <RadioButton
+          value="dark"
+          status={theme === 'dark' ? 'checked' : 'unchecked'}
+          onPress={() => setTheme('dark')}
+          color={colors.primary}
+        />
+      </View>
 
+      <Pressable onPress={handleSignout}>
+        <Text
+          style={{
+            fontSize: 24,
+            fontWeight: 'bold',
+            marginTop: 24,
+            color: isClicked ? '#8B0000' : 'red',
+          }}
+        >
+          Signout
+        </Text>
+      </Pressable>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 80,
-    paddingHorizontal: 20,
-    backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  radio: {
-    paddingVertical: 10,
-  },
-});
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      paddingTop: 10,
+      paddingHorizontal: 20,
+      backgroundColor: colors.background,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      marginTop: 20,
+      color: colors.text,
+    },
+    radioRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginTop: 16,
+    },
+    label: {
+      fontSize: 20,
+      fontWeight: '500',
+      color: colors.text,
+    },
+  });
+
