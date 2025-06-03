@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const router = express.Router();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your_secret';
+const JWT_SECRET = process.env.JWT_SECRET 
 
 
 router.get('/activity', async (req, res) => {
@@ -52,16 +52,6 @@ router.put('/update_activity', async (req, res) => {
       previousYogaSession
     } = req.body;
 
-    // Update favouriteYoga
-    // if (favouriteYoga !== undefined) {
-    //   user.favouriteYoga = favouriteYoga;
-    // }
-
-    // Update favouriteMusic
-    // if (favouriteMusic !== undefined) {
-    //   user.favouriteMusic = favouriteMusic;
-    // }
-
 
         // ✅ Append to favouriteYoga array (if not already included)
     if (favouriteYoga !== undefined) {
@@ -85,7 +75,7 @@ router.put('/update_activity', async (req, res) => {
 
     // Update or insert today's yoga session with full time addition
     if (typeof previousYogaSession === 'string') {
-      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+       const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Toronto' }); // Local Toronto date
       const newTime = parseDuration(previousYogaSession);
       if (!newTime) return res.status(400).json({ error: 'Invalid time format' });
 

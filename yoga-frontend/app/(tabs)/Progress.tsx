@@ -3,22 +3,42 @@ import { View, Text, StyleSheet, Button, Alert } from 'react-native';
 import Stopwatch from '@/components/Stopwatch';
 import { useRouter } from 'expo-router';
 import { useAddActivityMutation } from '@/store/api/yogaApi';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
+import { useTheme } from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
+
+
 
 const Progress = () => {
   const router = useRouter();
+  const { colors } = useTheme();
   const [addActivity] = useAddActivityMutation();
 
   const handleSave = async (duration: string) => {
-     console.log(duration)
+    console.log(duration)
     try {
       const result = await addActivity({ previousYogaSession: duration }).unwrap();
       console.log('Activity saved:', result);
-      Alert.alert('Saved!', 'Your session was recorded.');
+      Toast.show({
+        type: 'success',
+        text1: 'Saved!',
+        text2: 'Your yoga session was recorded.',
+                position: 'bottom',
+
+      });
+
     } catch (error) {
-      Alert.alert('Error', 'Could not save session.');
-      console.error(error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Could not save session.',
+                position: 'bottom',
+
+      }); console.error(error);
     }
   };
+
+  const styles = React.useMemo(() => getStyles(colors), [colors]);
 
   return (
     <View style={styles.container}>
@@ -38,7 +58,7 @@ const Progress = () => {
 
 export default Progress;
 
-const styles = StyleSheet.create({
+const getStyles = (colors: any) => StyleSheet.create({
   container: {
     alignItems: 'center',
     marginTop: 50,
@@ -46,7 +66,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 24,
-    color: '#83f53d',
+    color: colors.primary,
     fontWeight: 'bold',
     marginBottom: 20,
   },

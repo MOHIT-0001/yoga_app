@@ -10,6 +10,8 @@ import { useGetActivityQuery, useAddActivityMutation } from '../../store/api/yog
 import { useNavigation } from '@react-navigation/native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { useTheme } from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
+
 
 
 const YogaTypes = () => {
@@ -76,8 +78,18 @@ console.log('Adding favorite yoga with ID:', id);
       const res = await addActivity({ favouriteYoga: id }).unwrap();
       console.log('Added favorite yoga:', res);
       await refetch(); // Refetch to update favorites after successful add
+        Toast.show({
+      type: 'success',
+      text1: 'Yoga added to favorites',
+      
+    });
     } catch (error) {
       console.error('Error adding favorite yoga:', error);
+       Toast.show({
+      type: 'error',
+      text1: 'Failed to add yoga',
+      text2: error?.data?.message || 'Please try again',
+    });
     }
   };
 
@@ -88,9 +100,12 @@ console.log('Adding favorite yoga with ID:', id);
   useEffect(() => {
     navigation.setOptions({
       title: yogaTypes,
+          headerStyle: {
+      backgroundColor: colors.background, 
+    },
        headerTitleStyle: {
-      color: colors.text, // or any color like '#ff6347'
-      fontWeight: 'bold', // optional
+      color: colors.primary, 
+      fontWeight: 'bold', 
     },
     });
   }, [navigation]);
@@ -160,9 +175,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 10,
     right: 10,
-    // backgroundColor: 'white',
-    // borderRadius: 15,
-    // padding: 4,
     zIndex: 1,
   },
   loadingContainer: {

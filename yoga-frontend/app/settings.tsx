@@ -41,12 +41,15 @@ export default function SettingsScreen() {
   useEffect(() => {
     navigation.setOptions({
       title: 'Settings',
+      headerStyle: {
+      backgroundColor: colors.background, 
+    },
       headerTitleStyle: {
-        color: 'green', // or any color like '#ff6347'
+        color: colors.primary, // or any color like '#ff6347'
         fontWeight: 'bold', // optional
       },
     });
-  }, [navigation]);
+  }, [navigation, theme]);
 
   return (
    <View style={styles.container}>

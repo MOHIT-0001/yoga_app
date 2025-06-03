@@ -92,7 +92,7 @@ export default Stopwatch;
 const getStyles = (colors: any) =>StyleSheet.create({
   container: {
     alignItems: 'center',
-    marginTop: 50,
+    marginTop: 10,
   },
   timerText: {
     fontSize: 48,

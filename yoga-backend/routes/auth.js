@@ -4,8 +4,8 @@ const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const router = express.Router();
 
-const JWT_SECRET = 'your_secret';
-const JWT_REFRESH_SECRET = 'your_refresh_secret';
+const JWT_SECRET = process.env.JWT_SECRET
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET
 
 router.post('/signup', async (req, res) => {
   const { name, email, password } = req.body;

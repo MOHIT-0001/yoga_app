@@ -24,6 +24,8 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 import { useTheme } from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
+
 
 const screenWidth = Dimensions.get("window").width;
 const cardWidth = screenWidth / 2 - 20;
@@ -85,9 +87,18 @@ const Favorites = () => {
     try {
       await deleteActivity({ deleteFavouriteYoga: id });
       const result = await refetch(); // Refetch latest data
+      Toast.show({
+                  type: 'success',
+                  text1: 'Yoga removed from favorites',
+                });
     dispatch(setActivityData(result.data));
     } catch (error) {
       console.error("Error removing yoga favourite:", error);
+       Toast.show({
+                  type: 'error',
+                  text1: 'Failed to remove Yoga from favourites',
+                  text2: error?.data?.message || 'Please try again',
+                });
     }
   };
 
@@ -97,8 +108,17 @@ const Favorites = () => {
     // console.log("res",res)
     const result = await refetch(); // Refetch latest data
     dispatch(setActivityData(result.data));
+    Toast.show({
+                  type: 'success',
+                  text1: 'Music removed from favorites',
+                });
     } catch (error) {
       console.error("Error removing music favourite:", error);
+       Toast.show({
+                  type: 'error',
+                  text1: 'Failed to remove music from favorites',
+                  text2: error?.data?.message || 'Please try again',
+                });
     }
   };
 

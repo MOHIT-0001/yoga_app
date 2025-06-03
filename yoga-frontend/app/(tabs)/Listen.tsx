@@ -17,6 +17,8 @@ import { RootState } from '@/store';
 import { useGetMusicQuery, useAddActivityMutation, useGetActivityQuery } from '@/store/api/yogaApi';
 import { setActivityData } from '@/store/slices/activitySlice';
 import { useTheme } from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
+
 
 
 const screenWidth = Dimensions.get('window').width;
@@ -58,8 +60,17 @@ const Listen = () => {
       const res = await addActivity({ favouriteMusic: id }).unwrap();
       console.log('Added favorite music:', res);
       await refetch(); // Refetch to update favorite list
+       Toast.show({
+            type: 'success',
+            text1: 'Music added to favorites',
+          });
     } catch (error) {
       console.error('Error adding favorite music:', error);
+       Toast.show({
+            type: 'error',
+            text1: 'Failed to add Music to favorites',
+            text2: error?.data?.message || 'Please try again',
+          });
     }
   };
     const styles = React.useMemo(() => getStyles(colors), [colors]);

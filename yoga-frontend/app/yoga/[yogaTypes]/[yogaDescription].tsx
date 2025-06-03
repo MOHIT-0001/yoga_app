@@ -51,8 +51,11 @@ const YogaDescription = () => {
    useEffect(() => {
       navigation.setOptions({
         title: 'Practice Guide',
+        headerStyle: {
+      backgroundColor: colors.background, 
+    },
          headerTitleStyle: {
-      color: colors.text, // or any color like '#ff6347'
+      color: colors.primary, // or any color like '#ff6347'
       fontWeight: 'bold', // optional
     },
       });

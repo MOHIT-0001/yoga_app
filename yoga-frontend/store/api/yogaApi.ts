@@ -1,11 +1,13 @@
 // Your frontend file where yogaApi is defined
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import * as SecureStore from 'expo-secure-store';
+import Constants from 'expo-constants';
+
 
 export const yogaApi = createApi({
   reducerPath: 'yogaApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://10.0.2.2:5000/api/yoga', prepareHeaders: async (headers) => {
+    baseUrl:  Constants.expoConfig?.extra?.API_BASE_URL, prepareHeaders: async (headers) => {
       const token = await SecureStore.getItemAsync('accessToken');
       console.log('Token from SecureStore:', token); // Log the token for debugging
       if (token) {
