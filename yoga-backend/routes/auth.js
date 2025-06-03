@@ -1,0 +1,82 @@
+const express = require('express');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const User = require('../models/User');
+const router = express.Router();
+
+const JWT_SECRET = process.env.JWT_SECRET
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET
+
+router.post('/signup', async (req, res) => {
+  const { name, email, password } = req.body;
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      favouriteYoga: [],
+      favouriteMusic: [],
+      previousYogaSessions: []
+    });
+
+    res.status(201).json({ message: 'User created' });
+  } catch (err) {
+    console.error('Signup error:', err);
+    res.status(400).json({ error: 'User already exists or invalid data' });
+  }
+});
+
+router.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      return res.status(400).json({ error: 'Invalid credentials' });
+    }
+
+    // Generate tokens
+    const accessToken = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '15m' });
+    const refreshToken = jwt.sign({ id: user._id }, JWT_REFRESH_SECRET, { expiresIn: '10d' });
+
+    // Decode tokens to get expiration times
+    const accessTokenExp = jwt.decode(accessToken).exp * 1000; // Convert to ms
+    const refreshTokenExp = jwt.decode(refreshToken).exp * 1000;
+
+    res.json({
+      accessToken,
+      accessTokenExp,
+      refreshToken,
+      refreshTokenExp,
+      user: { name: user.name, email: user.email }
+    });
+
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+router.post('/refresh', (req, res) => {
+  const { token } = req.body;
+  try {
+    const payload = jwt.verify(token, JWT_REFRESH_SECRET);
+
+    const expiresIn = 15 * 60; // in seconds
+    const accessToken = jwt.sign({ id: payload.id }, JWT_SECRET, { expiresIn });
+
+    const accessTokenExp = Date.now() + expiresIn * 1000; // timestamp in milliseconds
+
+    res.json({ accessToken, accessTokenExp });
+  } catch (err) {
+    res.status(403).json({ error: 'Invalid refresh token' });
+  }
+});
+
+
+
+
+module.exports = router;
